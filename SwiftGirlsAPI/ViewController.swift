@@ -19,14 +19,12 @@ final public class ViewController: UIViewController {
         
         let fetchUser = FetchUser()
         
-        fetchUser.perform(name: "Swift Girls") { (user, error) in
-            if let user = user, error == nil {
-                self.displayingLabel.text = "Username: " + user.name
-            } else {
-                // error
-                self.displayingLabel.text = "Request failed"
-            }
-        }
+        fetchUser.perform(name: "Swift Girls")
+        .then(execute: { user in
+            self.displayingLabel.text = "Username: " + user.name
+        }).catch(execute: { e in
+            self.displayingLabel.text = "Request failed"
+        })
     }
 
 }

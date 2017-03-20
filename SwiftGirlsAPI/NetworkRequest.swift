@@ -9,6 +9,7 @@
 import Foundation
 import Alamofire
 import SwiftyJSON
+import PromiseKit
 
 protocol NetworkRequest {
     associatedtype ResponseType
@@ -18,7 +19,7 @@ protocol NetworkRequest {
     /// e.g. /cards/:id/dislike
     var endpoint: String { get }
     /// Will transform given data to requested type of response.
-    var responseHandler: (Data) -> ResponseType? { get }
+    var responseHandler: (Data) throws -> ResponseType { get }
     
     // Optional
     var baseURL: String { get }
@@ -47,10 +48,10 @@ extension NetworkRequest {
 }
 
 extension NetworkRequest where ResponseType : JSONDecodable {
-    var responseHandler: (Data) -> ResponseType? { return jsonResponseHandler }
+    var responseHandler: (Data) throws -> ResponseType { return jsonResponseHandler }
 }
 
-private func jsonResponseHandler<Response : JSONDecodable>(data: Data) -> Response? {
+private func jsonResponseHandler<Response : JSONDecodable>(data: Data) throws -> Response {
     let json = JSON(data: data)
-    return Response(json: json)
+    return try Response(json: json)
 }

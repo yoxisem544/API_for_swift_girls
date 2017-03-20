@@ -9,16 +9,18 @@
 import Foundation
 import SwiftyJSON
 import Alamofire
+import PromiseKit
 
 protocol NetworkClientType {
-    func makeRequest<Request: NetworkRequest>(networkRequest: Request,
-                                              callback: @escaping (Data?, Error?) -> ())
+    func makeRequest<Request: NetworkRequest>(networkRequest: Request) -> Promise<Data>
 }
 
 public struct NetworkClient : NetworkClientType {
     
-    func makeRequest<Request : NetworkRequest>(networkRequest: Request,
-                     callback: @escaping (Data?, Error?) -> ()) {
+    func makeRequest<Request : NetworkRequest>(networkRequest: Request) -> Promise<Data> {
+        
+        let (promise, fulfill, reject) = Promise<Data>.pending()
+        
         request(networkRequest.url,
                 method: networkRequest.method,
                 parameters: networkRequest.parameters,
@@ -27,12 +29,14 @@ public struct NetworkClient : NetworkClientType {
         .validate()
         .response(completionHandler: { response in
             if let data = response.data, response.error == nil {
-                callback(data, nil)
+                fulfill(data)
             } else {
                 // error
-                callback(nil, response.error)
+                reject(response.error!)
             }
         })
+        
+        return promise
     }
     
 }
