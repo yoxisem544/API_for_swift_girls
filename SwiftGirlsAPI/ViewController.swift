@@ -17,20 +17,16 @@ final public class ViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        let url = "http://httpbin.org/post"
-        let params = ["name": "Swift Girls"]
+        let networkClient = NetworkClient()
         
-        NetworkClient.makeRequest(url: url,
-                                  method: HTTPMethod.post,
-                                  parameters: params,
-        callback: { (json, error) in
-            if let json = json, error == nil {
-                self.displayingLabel.text = "Username: " + json["json"]["name"].stringValue
+        networkClient.fetchUser { (name, error) in
+            if let name = name, error == nil {
+                self.displayingLabel.text = "Username: " + name
             } else {
                 // error
                 self.displayingLabel.text = "Request failed"
             }
-        })
+        }
     }
 
 }
