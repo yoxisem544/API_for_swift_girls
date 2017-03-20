@@ -19,9 +19,9 @@ final public class ViewController: UIViewController {
         
         let networkClient = NetworkClient()
         
-        networkClient.fetchUser { (name, error) in
-            if let name = name, error == nil {
-                self.displayingLabel.text = "Username: " + name
+        networkClient.fetchUser { (user, error) in
+            if let user = user, error == nil {
+                self.displayingLabel.text = "Username: " + user.name
             } else {
                 // error
                 self.displayingLabel.text = "Request failed"

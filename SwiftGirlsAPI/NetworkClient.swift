@@ -14,18 +14,18 @@ protocol NetworkClientType {
     func makeRequest(url: String,
                             method: HTTPMethod,
                             parameters: [String : Any],
-                            callback: @escaping (JSON?, Error?) -> ())
+                            callback: @escaping (User?, Error?) -> ())
 }
 
 public struct NetworkClient : NetworkClientType {
     
-    func fetchUser(callback: @escaping (String?, Error?) -> ()) {
+    func fetchUser(callback: @escaping (User?, Error?) -> ()) {
         let url = "http://httpbin.org/post"
         let params = ["name": "Swift Girls"]
         
-        makeRequest(url: url, method: HTTPMethod.post, parameters: params, callback: { (json, error) in
-            if let json = json, error == nil {
-                callback(json["json"]["name"].string, nil)
+        makeRequest(url: url, method: HTTPMethod.post, parameters: params, callback: { (user, error) in
+            if let user = user, error == nil {
+                callback(user, nil)
             } else {
                 // error
                 callback(nil, error)
@@ -36,7 +36,7 @@ public struct NetworkClient : NetworkClientType {
     func makeRequest(url: String,
                             method: HTTPMethod,
                             parameters: [String : Any],
-                            callback: @escaping (JSON?, Error?) -> ()) {
+                            callback: @escaping (User?, Error?) -> ()) {
         request(url,
                 method: method,
                 parameters: parameters,
@@ -46,7 +46,8 @@ public struct NetworkClient : NetworkClientType {
         .response(completionHandler: { response in
             if let data = response.data, response.error == nil {
                 let json = JSON(data: data)
-                callback(json, nil)
+                let user = User(json: json)
+                callback(user, nil)
             } else {
                 // error
                 callback(nil, response.error)
