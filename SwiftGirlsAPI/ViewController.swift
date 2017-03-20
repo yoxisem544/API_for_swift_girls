@@ -20,14 +20,11 @@ final public class ViewController: UIViewController {
         let url = "http://httpbin.org/post"
         let params = ["name": "Swift Girls"]
         
-        request(url,
-                method: HTTPMethod.post,
-                parameters: params,
-                encoding: JSONEncoding.default, headers: nil)
-        .validate()
-        .response(completionHandler: { response in
-            if let data = response.data, response.error == nil {
-            let json = JSON(data: data)
+        NetworkClient.makeRequest(url: url,
+                                  method: HTTPMethod.post,
+                                  parameters: params,
+        callback: { (json, error) in
+            if let json = json, error == nil {
                 self.displayingLabel.text = "Username: " + json["json"]["name"].stringValue
             } else {
                 // error
