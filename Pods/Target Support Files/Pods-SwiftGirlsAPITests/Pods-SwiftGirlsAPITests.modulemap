@@ -1,0 +1,6 @@
+framework module Pods_SwiftGirlsAPITests {
+  umbrella header "Pods-SwiftGirlsAPITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

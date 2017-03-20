@@ -1,0 +1,6 @@
+framework module Pods_SwiftGirlsAPI {
+  umbrella header "Pods-SwiftGirlsAPI-umbrella.h"
+
+  export *
+  module * { export * }
+}
