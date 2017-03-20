@@ -11,10 +11,10 @@ import SwiftyJSON
 import Alamofire
 
 protocol NetworkClientType {
-    func makeRequest(url: String,
-                            method: HTTPMethod,
-                            parameters: [String : Any],
-                            callback: @escaping (User?, Error?) -> ())
+    func makeRequest<Response: JSONDecodable>(url: String,
+                                              method: HTTPMethod,
+                                              parameters: [String : Any],
+                                              callback: @escaping (Response?, Error?) -> ())
 }
 
 public struct NetworkClient : NetworkClientType {
@@ -23,7 +23,7 @@ public struct NetworkClient : NetworkClientType {
         let url = "http://httpbin.org/post"
         let params = ["name": "Swift Girls"]
         
-        makeRequest(url: url, method: HTTPMethod.post, parameters: params, callback: { (user, error) in
+        makeRequest(url: url, method: HTTPMethod.post, parameters: params, callback: { (user: User?, error: Error?) in
             if let user = user, error == nil {
                 callback(user, nil)
             } else {
@@ -33,10 +33,10 @@ public struct NetworkClient : NetworkClientType {
         })
     }
 
-    func makeRequest(url: String,
-                            method: HTTPMethod,
-                            parameters: [String : Any],
-                            callback: @escaping (User?, Error?) -> ()) {
+    func makeRequest<Response: JSONDecodable>(url: String,
+                     method: HTTPMethod,
+                     parameters: [String : Any],
+                     callback: @escaping (Response?, Error?) -> ()) {
         request(url,
                 method: method,
                 parameters: parameters,
@@ -46,8 +46,8 @@ public struct NetworkClient : NetworkClientType {
         .response(completionHandler: { response in
             if let data = response.data, response.error == nil {
                 let json = JSON(data: data)
-                let user = User(json: json)
-                callback(user, nil)
+                let response = Response(json: json)
+                callback(response, nil)
             } else {
                 // error
                 callback(nil, response.error)
