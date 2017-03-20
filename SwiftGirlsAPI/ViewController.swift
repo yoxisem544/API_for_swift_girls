@@ -17,9 +17,9 @@ final public class ViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        let networkClient = NetworkClient()
+        let fetchUser = FetchUser()
         
-        networkClient.fetchUser { (user, error) in
+        fetchUser.perform(name: "Swift Girls") { (user, error) in
             if let user = user, error == nil {
                 self.displayingLabel.text = "Username: " + user.name
             } else {

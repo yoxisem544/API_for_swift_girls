@@ -11,43 +11,23 @@ import SwiftyJSON
 import Alamofire
 
 protocol NetworkClientType {
-    func makeRequest<Response: JSONDecodable>(url: String,
-                                              method: HTTPMethod,
-                                              parameters: [String : Any],
-                                              callback: @escaping (Response?, Error?) -> ())
+    func makeRequest<Request: NetworkRequest>(networkRequest: Request,
+                                              callback: @escaping (Data?, Error?) -> ())
 }
 
 public struct NetworkClient : NetworkClientType {
     
-    func fetchUser(callback: @escaping (User?, Error?) -> ()) {
-        let url = "http://httpbin.org/post"
-        let params = ["name": "Swift Girls"]
-        
-        makeRequest(url: url, method: HTTPMethod.post, parameters: params, callback: { (user: User?, error: Error?) in
-            if let user = user, error == nil {
-                callback(user, nil)
-            } else {
-                // error
-                callback(nil, error)
-            }
-        })
-    }
-
-    func makeRequest<Response: JSONDecodable>(url: String,
-                     method: HTTPMethod,
-                     parameters: [String : Any],
-                     callback: @escaping (Response?, Error?) -> ()) {
-        request(url,
-                method: method,
-                parameters: parameters,
-                encoding: JSONEncoding.default,
-                headers: nil)
+    func makeRequest<Request : NetworkRequest>(networkRequest: Request,
+                     callback: @escaping (Data?, Error?) -> ()) {
+        request(networkRequest.url,
+                method: networkRequest.method,
+                parameters: networkRequest.parameters,
+                encoding: networkRequest.encoding,
+                headers: networkRequest.headers)
         .validate()
         .response(completionHandler: { response in
             if let data = response.data, response.error == nil {
-                let json = JSON(data: data)
-                let response = Response(json: json)
-                callback(response, nil)
+                callback(data, nil)
             } else {
                 // error
                 callback(nil, response.error)
