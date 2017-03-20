@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import SwiftyJSON
+import Alamofire
 
 final public class ViewController: UIViewController {
 
@@ -14,6 +16,24 @@ final public class ViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let url = "http://httpbin.org/post"
+        let params = ["name": "Swift Girls"]
+        
+        request(url,
+                method: HTTPMethod.post,
+                parameters: params,
+                encoding: JSONEncoding.default, headers: nil)
+        .validate()
+        .response(completionHandler: { response in
+            if let data = response.data, response.error == nil {
+            let json = JSON(data: data)
+                self.displayingLabel.text = "Username: " + json["json"]["name"].stringValue
+            } else {
+                // error
+                self.displayingLabel.text = "Request failed"
+            }
+        })
     }
 
 }
